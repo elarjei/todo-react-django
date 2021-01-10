@@ -30,7 +30,9 @@ export default class CustomModal extends Component {
         const { toggle, onSave } = this.props;
         return(
             <Modal isOpen={ true } toggle={ toggle }>
-                <ModalHeader toggle={ toggle }>Agenda Baru</ModalHeader>
+                <ModalHeader toggle={ toggle }>
+                    Agenda Baru
+                </ModalHeader>
                 <ModalBody>
                     <Form>
                         <FormGroup>
@@ -50,7 +52,7 @@ export default class CustomModal extends Component {
                                 name='description'
                                 value={ this.state.activeItem.description }
                                 onChange={ this.handleChange }
-                                placeholder='Tuliskan detail agenda kamu bebb'
+                                placeholder='Ayang perlu nulis detail agenda di sini'
                             />
                         </FormGroup>
                         <FormGroup check>
@@ -67,7 +69,7 @@ export default class CustomModal extends Component {
                     </Form>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color='primary' onClick={() => onSave(this.state.activeItem)}>
+                    <Button color='success' onClick={() => onSave(this.state.activeItem)}>
                         Simpan
                     </Button>
                 </ModalFooter>

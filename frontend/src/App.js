@@ -1,51 +1,29 @@
-import React, { Component } from 'react'
-import Modal from './components/Modal'
-
-const todoItems = [
-  {
-    id: 2,
-    title: 'pulang',
-    description: 'magang hari ini telah selesai',
-    completed: false,
-  },
-  {
-    id: 3,
-    title: 'beli bumbu nasgor',
-    description: 'buat nasi sisa kemaren',
-    completed: true,
-  },
-];
+import React, { Component } from 'react';
+import Modal from './components/Modal';
+import axios from "axios";
+import Cookies from "js.cookie";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal: false,
       viewCompleted: false,
       activeItem: {
         title: '',
         description: '',
         completed: false,
       },
-      todoList: todoItems,
+      todoList: [],
     }
   }
-  toggle = () => {
-    this.setState({ modal: !this.state.modal });
+  componentDidMount() {
+    this.refreshList();
   }
-  handleSubmit = item => {
-    this.toggle();
-    alert("Simpan " + JSON.stringify(item));
-  }
-  handleDelete = item => {
-    alert("Hapus " + JSON.stringify(item));
-  }
-  createItem = () => {
-    const item = { title: "", description: "", completed: false };
-    this.setState({ activeItem: item, modal: !this.state.modal });
-  }
-  editItem = item => {
-    this.setState({ activeItem: item, modal: !this.state.modal });
+  refreshList = () => {
+    axios
+      .get('/api/todos/')
+      .then(response => this.setState({ todoList: response.data }))
+      .catch(err => console.log(err));
   }
   displayCompleted = status => {
     if (status) {
@@ -95,27 +73,57 @@ class App extends Component {
             className="btn btn-secondary mr-2"
             onClick={() => this.editItem(item)}
           >
-            Edit
+            {" "}
+            Edit{" "}
           </button>
           <button
             className="btn btn-danger"
             onClick={() => this.handleDelete(item)}
           >
-            Hapus
+            Hapus{" "}
           </button>
         </span>
       </li>
     ));
   }
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  }
+  handleSubmit = item => {
+    this.toggle();
+    var csrftoken = Cookies.get('csrftoken');
+    if (item.id) {
+      axios
+        .put(`/api/todos/${item.id}/`, item, {headers: { 'X-CSRFToken': csrftoken }})
+        .then(response => this.refreshList());
+      return;
+    }
+    axios
+      .post("/api/todos/", item, {headers: { 'X-CSRFToken': csrftoken }})
+      .then(response => this.refreshList());
+  }
+  handleDelete = item => {
+    var csrftoken = Cookies.get('csrftoken');
+    axios
+      .delete(`/api/todos/${item.id}/`, {headers: { 'X-CSRFToken': csrftoken }})
+      .then(response => this.refreshList());
+  }
+  createItem = () => {
+    const item = { title: "", description: "", completed: false };
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  }
+  editItem = item => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  }
   render() {
     return (
       <main className="content">
-        <h1 className="text-white text-uppercase text-center my-4">
-          Ayang, ini agenda kamu
+        <h1 className="text-black text-center my-4">
+          Ayaang, ini agenda kamu 💋
         </h1>
         <div className="row">
           <div className="col-md-6 col-sm-10 mx-auto p-0">
-            <div className="card p-3">
+            <div className="card p-3 m-2">
               <div className="">
                 <button
                   className="btn btn-primary"
